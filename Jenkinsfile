@@ -1,248 +1,111 @@
-pipeline {
-    // run on jenkins nodes tha has java 8 label
-     	agent any
-	tools {
-	    maven 'Maven 3.3.9'
-	    jdk 'jdk8'
-	}
-    environment {
-        EMAIL_RECIPIENTS = 'ludovic.brule@gmail.com'
-    }
-    stages {
+Skip to content
+ 
+Search or jump to…
 
-        stage('Build with unit testing') {
-            steps {
-                // Run the maven build
-                script {
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@lbrule 
+Learn Git and GitHub without any code!
+Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
+
+ 
+1
+0 108 lbrule/super-csv
+forked from super-csv/super-csv
+ Code  Pull requests 0  Projects 0  Wiki  Security  Insights  Settings
+super-csv/Jenkinsfile2
+@lbrule lbrule Rename Jenkinsfile to Jenkinsfile2
+3702f5e 24 minutes ago
+100 lines (94 sloc)  4.26 KB
+    
+#!groovy
+
+/*
+    job de build des projets LBPF
+*/
+
+    def String scmURLWithoutHttp;
+    def scmURL = "";
+    pipeline {
+        agent any
+        tools {
+            maven 'Maven 3.3.9'
+            jdk 'jdk8'
+        }
+        stages {
+            stage("IC - Checkout") {
+                steps {
                     checkout scm
                     echo "scm = ${scm}"
                     echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
-
-                    // Get the Maven tool.
-                    // ** NOTE: This 'M3' Maven tool must be configured
-                    // **       in the global configuration.
-                    echo 'Pulling...' + env.BRANCH_NAME
-                        bat 'mvn -Dintegration-tests.skip=true clean package'
+               }
+            }
+            stage("IC - Clean Install") {
+                steps {
+                     script {
+                        // Get the Maven tool.
+                        // ** NOTE: This 'M3' Maven tool must be configured
+                        // **       in the global configuration.
+			echo 'Pulling...' + env.BRANCH_NAME
+                        def mvnHome = tool 'Maven 3.3.9'
+                       	def targetVersion = getDevVersion()
+                        echo 'target build version...'
+                        echo targetVersion
                         def pom = readMavenPom file: 'pom.xml'
-                        print pom.version
-                        junit '**//*target/surefire-reports/TEST-*.xml'
-                        archive 'target*//*.jar'
-                }
+                            // get the current development version 
+                       	developmentArtifactVersion = "${pom.version}-${targetVersion}"
+                        echo ${pom.version}
+                        echo ${developmentArtifactVersion}
 
-            }
-        }
-        stage('Integration tests') {
-            // Run integration test
-            steps {
-                script {
-                    def mvnHome = tool 'Maven 3.3.8'
-                        bat(/"${mvnHome}\bin\mvn" verify -Dunit-tests.skip=true/)
-                }
-                // cucumber reports collection
-                cucumber buildStatus: null, fileIncludePattern: '**/cucumber.json', jsonReportDirectory: 'target', sortingMethod: 'ALPHABETICAL'
-            }
-        }
-        stage('Sonar scan execution') {
-            // Run the sonar scan
-            steps {
-                script {
-                    def mvnHome = tool 'Maven 3.3.8'
-//                    withSonarQubeEnv {
-//                        sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
-//                    }
-                }
-            }
-        }
-        stage('Development deploy approval and deployment') {
-            steps {
-                script {
-                    if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        timeout(time: 3, unit: 'MINUTES') {
-                            // you can use the commented line if u have specific user group who CAN ONLY approve
-                            //input message:'Approve deployment?', submitter: 'it-ops'
-                            input message: 'Approve deployment?'
-                        }
-                        timeout(time: 2, unit: 'MINUTES') {
-                            //
-                            if (developmentArtifactVersion != null && !developmentArtifactVersion.isEmpty()) {
-                                // replace it with your application name or make it easily loaded from pom.xml
-                                def jarName = "application-${developmentArtifactVersion}.jar"
-                                echo "the application is deploying ${jarName}"
-                                // NOTE : CREATE your deployemnt JOB, where it can take parameters whoch is the jar name to fetch from jenkins workspace
-                                build job: 'ApplicationToDev', parameters: [[$class: 'StringParameterValue', name: 'jarName', value: jarName]]
-                                echo 'the application is deployed !'
-                            } else {
-                                error 'the application is not  deployed as development version is null!'
-                            }
-
-                        }
+                   //bat 'mvn -Dmaven.test.failure.ignore=true install'
+                    //bat 'mvn  -Dmaven.test.skip=truet  versions:set  -DgenerateBackupPoms=false -DnewVersion=2.0.8'
+                    //bat "mvn -X -Dmaven.javadoc.skip=true --batch-mode release:clean release:prepare release:perform"
+                    //bat 'git add .'
+                    //bat 'git commit -m "Test."'
+                    bat 'git tag -a v2.0.8-test -m "Test Tag."'
+                    bat 'git tag'
+                    bat 'git remote show origin'
+                    bat "git config --global user.email 'ludovic.brule@gmail.com'"
+                    bat "git config --global user.name 'ludovic.brule@gmail.com'"
+                    //bat 'git config --global --unset https.proxy'
+                    //bat 'git config --global --unset http.proxy'
+                    //bat "git push origin v2.0.8-test"
+                    
+                    withCredentials([usernamePassword(credentialsId: '01fdcf13-8f12-47be-9a79-2e2f7a0846d0', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                      //  bat "echo 'GIT_USERNAME = ${GIT_USERNAME}'>ludo.txt"
+                       // bat "echo 'GIT_PASSWORD = ${GIT_PASSWORD}'>>ludo.txt"
+                        bat "git rebase origin/master"
+                        bat "git push -v --all"
                     }
                 }
             }
+       }
         }
-        stage('DEV sanity check') {
-            steps {
-                // give some time till the deployment is done, so we wait 45 seconds
-                sleep(45)
-                script {
-                    if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        timeout(time: 1, unit: 'MINUTES') {
-                            script {
-                                def mvnHome = tool 'Maven 3.3.8'
-                                //NOTE : if u change the sanity test class name , change it here as well
-                                sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationSanityCheck_ITT surefire:test"
-                            }
-
-                        }
-                    }
-                }
-            }
+    def getDevVersion() {
+        def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        def versionNumber;
+        if (gitCommit == null) {
+            versionNumber = env.BUILD_NUMBER;
+        } else {
+            versionNumber = gitCommit.take(8);
         }
-        stage('Release and publish artifact') {
-            when {
-                // check if branch is master
-                branch 'master'
-            }
-            steps {
-                // create the release version then create a tage with it , then push to nexus releases the released jar
-                script {
-                    def mvnHome = tool 'Maven 3.3.8' //
-                    if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        def v = getReleaseVersion()
-                        releasedVersion = v;
-                        if (v) {
-                            echo "Building version ${v} - so released version is ${releasedVersion}"
-                        }
-                        // jenkins user credentials ID which is transparent to the user and password change
-                        sshagent(['0000000-3b5a-454e-a8e6-c6b6114d36000']) {
-                            sh "git tag -f v${v}"
-                            sh "git push -f --tags"
-                        }
-                        sh "'${mvnHome}/bin/mvn' -Dmaven.test.skip=true  versions:set  -DgenerateBackupPoms=false -DnewVersion=${v}"
-                        sh "'${mvnHome}/bin/mvn' -Dmaven.test.skip=true clean deploy"
-
-                    } else {
-                        error "Release is not possible. as build is not successful"
-                    }
-                }
-            }
-        }
-    }
-    post {
-        // Always runs. And it runs before any of the other post conditions.
-        always {
-            // Let's wipe out the workspace before we finish!
-            deleteDir()
-        }
-        success {
-            sendEmail("Successful");
-        }
-        unstable {
-            sendEmail("Unstable");
-        }
-        failure {
-            sendEmail("Failed");
-        }
+        print 'build  versions...'
+        print versionNumber
+        return versionNumber
     }
 
-// The options directive is for configuration that applies to the whole job.
-    options {
-        // For example, we'd like to make sure we only keep 10 builds at a time, so
-        // we don't fill up our storage!
-        buildDiscarder(logRotator(numToKeepStr: '5'))
-
-        // And we'd really like to be sure that this build doesn't hang forever, so
-        // let's time it out after an hour.
-        timeout(time: 25, unit: 'MINUTES')
+    def getReleaseVersion() {
+        def pom = readMavenPom file: 'pom.xml'
+        def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        def versionNumber;
+        if (gitCommit == null) {
+            versionNumber = env.BUILD_NUMBER;
+        } else {
+            versionNumber = gitCommit.take(8);
+        }
+        return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
     }
-
 }
-def developmentArtifactVersion = ''
-def releasedVersion = ''
-// get change log to be send over the mail
-@NonCPS
-def getChangeString() {
-    MAX_MSG_LEN = 100
-    def changeString = ""
-
-    echo "Gathering SCM changes"
-    def changeLogSets = currentBuild.changeSets
-    for (int i = 0; i < changeLogSets.size(); i++) {
-        def entries = changeLogSets[i].items
-        for (int j = 0; j < entries.length; j++) {
-            def entry = entries[j]
-            truncated_msg = entry.msg.take(MAX_MSG_LEN)
-            changeString += " - ${truncated_msg} [${entry.author}]\n"
-        }
-    }
-
-    if (!changeString) {
-        changeString = " - No new changes"
-    }
-    return changeString
-}
-
-def sendEmail(status) {
-    mail(
-            to: "$EMAIL_RECIPIENTS",
-            subject: "Build $BUILD_NUMBER - " + status + " (${currentBuild.fullDisplayName})",
-            body: "Changes:\n " + getChangeString() + "\n\n Check console output at: $BUILD_URL/console" + "\n")
-}
-
-def getDevVersion() {
-    def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-    def versionNumber;
-    if (gitCommit == null) {
-        versionNumber = env.BUILD_NUMBER;
-    } else {
-        versionNumber = gitCommit.take(8);
-    }
-    print 'build  versions...'
-    print versionNumber
-    return versionNumber
-}
-
-def getReleaseVersion() {
-    def pom = readMavenPom file: 'pom.xml'
-    def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-    def versionNumber;
-    if (gitCommit == null) {
-        versionNumber = env.BUILD_NUMBER;
-    } else {
-        versionNumber = gitCommit.take(8);
-    }
-    return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
-}
-
-def isUnix() {
-	return false;
-}
-
-// if you want parallel execution , check below :
-/* stage('Quality Gate(Integration Tests and Sonar Scan)') {
-           // Run the maven build
-           steps {
-               parallel(
-                       IntegrationTest: {
-                           script {
-                               def mvnHome = tool 'Maven 3.3.8'
-                               if (isUnix()) {
-                                   sh "'${mvnHome}/bin/mvn'  verify -Dunit-tests.skip=true"
-                               } else {
-                                   bat(/"${mvnHome}\bin\mvn" verify -Dunit-tests.skip=true/)
-                               }
-
-                           }
-                       },
-                       SonarCheck: {
-                           script {
-                               def mvnHome = tool 'Maven 3.3.8'
-                               withSonarQubeEnv {
-                                   // sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dsonar.host.url=http://bicsjava.bc/sonar/ -Dmaven.test.failure.ignore=true"
-                                   sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dmaven.test.failure.ignore=true"
-                               }
-                           }
-                       },
-                       failFast: true)
-           }
-       }*/
