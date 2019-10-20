@@ -23,7 +23,7 @@
             stage("IC - Clean Install") {
 		    when {
 			// check if branch is master
-			branch 'master2'
+			branch 'master'
 		    }
                 steps {
                      script {
@@ -45,7 +45,7 @@
                       //  bat "echo 'GIT_USERNAME = ${GIT_USERNAME}'>ludo.txt"
                        // bat "echo 'GIT_PASSWORD = ${GIT_PASSWORD}'>>ludo.txt"
                         bat "git rebase origin/master"
-                        bat "git push -v --all"
+                        bat "git push -v origin v2.0.8-test"
                     }
                 }
             }
