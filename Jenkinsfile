@@ -19,8 +19,6 @@ def call(context) {
                     echo "scm = ${scm}"
                }
             }
-                        scmURLWithoutHttps = scmURL.replaceAll('https://','');
-                        echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
             stage("IC - Clean Install") {
                 steps {
                     bat 'mvn -Dmaven.test.failure.ignore=true install'
