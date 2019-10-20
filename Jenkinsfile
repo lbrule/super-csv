@@ -39,7 +39,7 @@
                       //  bat "echo 'GIT_USERNAME = ${GIT_USERNAME}'>ludo.txt"
                        // bat "echo 'GIT_PASSWORD = ${GIT_PASSWORD}'>>ludo.txt"
                         bat "git rebase origin/master"
-                        bat "git push -v https://${GIT_USERNAME}:${GIT_PASSWORD}@${scm.userRemoteConfigs[0].url.replaceAll('https://','')} --all"
+                        bat "git push -v --all"
                     }
                 }
             }
