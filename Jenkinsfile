@@ -28,7 +28,7 @@
                     bat 'git commit -m "Test."'
                     bat 'git tag -a v2.0.1-test -m "Test Tag."'
                     withCredentials([usernamePassword(credentialsId: 'e6d21786-af14-4eff-b65e-fd682ccdf65e', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        bat 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${scm.userRemoteConfigs[0].url.replaceAll('https://','')} origin v2.0.1-test'
+                        bat "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${scm.userRemoteConfigs[0].url.replaceAll('https://','')} origin v2.0.1-test"
                     }
                 }
             }
