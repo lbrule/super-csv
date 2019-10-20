@@ -4,7 +4,6 @@
     job de build des projets LBPF
 */
 
-def call(context) {
     def String scmURLWithoutHttp;
     pipeline {
         agent any
@@ -32,4 +31,4 @@ def call(context) {
             }
        }
     }
-}
+
