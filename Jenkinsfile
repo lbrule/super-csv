@@ -19,7 +19,7 @@ pipeline {
                     // **       in the global configuration.
                     echo 'Pulling...' + env.BRANCH_NAME
                     def mvnHome = tool 'Maven 3.3.8'
-                        bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
+                        bat(/"mvn" -Dintegration-tests.skip=true clean package/)
                         def pom = readMavenPom file: 'pom.xml'
                         print pom.version
                         junit '**//*target/surefire-reports/TEST-*.xml'
