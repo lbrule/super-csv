@@ -1,4 +1,5 @@
 pipeline {
+    def String scmURLWithoutHttp;
     agent any
     tools {
         maven 'Maven 3.3.9'
@@ -8,6 +9,7 @@ pipeline {
         stage("IC - Checkout") {
             steps {
                 checkout scm
+                scmURLWithoutHttps = scmURL.replaceAll('https://','');
             }
         }
         stage("IC - Clean Install") {
@@ -18,7 +20,6 @@ pipeline {
                 bat 'git commit -m "Test."'
                 bat 'git tag -a v2.0.1-test -m "Test Tag."'
                 withCredentials([usernamePassword(credentialsId: '	e6d21786-af14-4eff-b65e-fd682ccdf65e', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    def String scmURLWithoutHttps = scmURL.replaceAll('https://','');
                     bat 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${scmURLWithoutHttps} origin v2.0.1-test'
                 }
             }
