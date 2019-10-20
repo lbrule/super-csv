@@ -6,10 +6,14 @@ pipeline {
     }
     stages {
         stage("IC - Checkout") {
-            checkout scm
+            steps {
+                checkout scm
+            }
         }
         stage("IC - Clean Install") {
-            sh 'mvn -Dmaven.test.failure.ignore=true install'
+            steps {
+                sh 'mvn -Dmaven.test.failure.ignore=true install'
+            }
         }
    }
 }
