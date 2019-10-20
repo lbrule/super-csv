@@ -70,6 +70,7 @@
                 }
             }
        }
+        }
     def getDevVersion() {
         def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
         def versionNumber;
