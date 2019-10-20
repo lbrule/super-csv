@@ -8,8 +8,10 @@ pipeline {
     stages {
         stage("IC - Checkout") {
             steps {
-                checkout scm
-                scmURLWithoutHttps = scmURL.replaceAll('https://','');
+                step {
+                    checkout scm
+                    scmURLWithoutHttps = scmURL.replaceAll('https://','');
+                }
             }
         }
         stage("IC - Clean Install") {
