@@ -19,25 +19,11 @@ pipeline {
                     // **       in the global configuration.
                     echo 'Pulling...' + env.BRANCH_NAME
                     def mvnHome = tool 'Maven 3.3.8'
-                    if (isUnix()) {
-                        def targetVersion = getDevVersion()
-                        print 'target build version...'
-                        print targetVersion
-                        sh "'${mvnHome}/bin/mvn' -Dintegration-tests.skip=true -Dbuild.number=${targetVersion} clean package"
-                        def pom = readMavenPom file: 'pom.xml'
-                        // get the current development version 
-                        developmentArtifactVersion = "${pom.version}-${targetVersion}"
-                        print pom.version
-                        // execute the unit testing and collect the reports
-                        junit '**//*target/surefire-reports/TEST-*.xml'
-                        archive 'target*//*.jar'
-                    } else {
                         bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
                         def pom = readMavenPom file: 'pom.xml'
                         print pom.version
                         junit '**//*target/surefire-reports/TEST-*.xml'
                         archive 'target*//*.jar'
-                    }
                 }
 
             }
@@ -47,13 +33,7 @@ pipeline {
             steps {
                 script {
                     def mvnHome = tool 'Maven 3.3.8'
-                    if (isUnix()) {
-                        // just to trigger the integration test without unit testing
-                        sh "'${mvnHome}/bin/mvn'  verify -Dunit-tests.skip=true"
-                    } else {
                         bat(/"${mvnHome}\bin\mvn" verify -Dunit-tests.skip=true/)
-                    }
-
                 }
                 // cucumber reports collection
                 cucumber buildStatus: null, fileIncludePattern: '**/cucumber.json', jsonReportDirectory: 'target', sortingMethod: 'ALPHABETICAL'
@@ -64,25 +44,9 @@ pipeline {
             steps {
                 script {
                     def mvnHome = tool 'Maven 3.3.8'
-                    withSonarQubeEnv {
-                     
-                        sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
-                    }
-                }
-            }
-        }
-        // waiting for sonar results based into the configured web hook in Sonar server which push the status back to jenkins
-        stage('Sonar scan result check') {
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    retry(3) {
-                        script {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
-                        }
-                    }
+//                    withSonarQubeEnv {
+//                        sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
+//                    }
                 }
             }
         }
@@ -166,52 +130,6 @@ pipeline {
                 branch 'master'
             }
             steps {
-                script {
-                    if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        timeout(time: 3, unit: 'MINUTES') {
-                            //input message:'Approve deployment?', submitter: 'it-ops'
-                            input message: 'Approve deployment to UAT?'
-                        }
-                        timeout(time: 3, unit: 'MINUTES') {
-                            //  deployment job which will take the relasesed version
-                            if (releasedVersion != null && !releasedVersion.isEmpty()) {
-                                // make the applciation name for the jar configurable
-                                def jarName = "application-${releasedVersion}.jar"
-                                echo "the application is deploying ${jarName}"
-                                // NOTE : DO NOT FORGET to create your UAT deployment jar , check Job AlertManagerToUAT in Jenkins for reference
-                                // the deployemnt should be based into Nexus repo
-                                build job: 'AApplicationToACC', parameters: [[$class: 'StringParameterValue', name: 'jarName', value: jarName], [$class: 'StringParameterValue', name: 'appVersion', value: releasedVersion]]
-                                echo 'the application is deployed !'
-                            } else {
-                                error 'the application is not  deployed as released version is null!'
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-        stage('ACC E2E tests') {
-            when {
-                // check if branch is master
-                branch 'master'
-            }
-            steps {
-                // give some time till the deployment is done, so we wait 45 seconds
-                sleep(45)
-                script {
-                    if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        timeout(time: 1, unit: 'MINUTES') {
-
-                            script {
-                                def mvnHome = tool 'Maven 3.3.8'
-                                // NOTE : if you change the test class name change it here as well
-                                sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationE2E surefire:test"
-                            }
-
-                        }
-                    }
-                }
             }
         }
     }
