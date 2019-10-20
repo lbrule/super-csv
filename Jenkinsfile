@@ -22,7 +22,32 @@
             }
             stage("IC - Clean Install") {
                 steps {
-                    //bat 'mvn -Dmaven.test.failure.ignore=true install'
+                     script {
+                        // Get the Maven tool.
+                        // ** NOTE: This 'M3' Maven tool must be configured
+                        // **       in the global configuration.
+                        echo 'Pulling...' + env.BRANCH_NAME
+                        def mvnHome = tool 'Maven 3.3.9'
+                        if (isUnix()) {
+                            def targetVersion = getDevVersion()
+                            print 'target build version...'
+                            print targetVersion
+                            sh "'${mvnHome}/bin/mvn' -Dintegration-tests.skip=true -Dbuild.number=${targetVersion} clean package"
+                            def pom = readMavenPom file: 'pom.xml'
+                            // get the current development version 
+                            developmentArtifactVersion = "${pom.version}-${targetVersion}"
+                            print pom.version
+                            // execute the unit testing and collect the reports
+                            junit '**//*target/surefire-reports/TEST-*.xml'
+                            archive 'target*//*.jar'
+                        } else {
+                            bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
+                            def pom = readMavenPom file: 'pom.xml'
+                            print pom.version
+                            junit '**//*target/surefire-reports/TEST-*.xml'
+                            archive 'target*//*.jar'
+                        }
+                   //bat 'mvn -Dmaven.test.failure.ignore=true install'
                     //bat 'mvn  -Dmaven.test.skip=truet  versions:set  -DgenerateBackupPoms=false -DnewVersion=2.0.8'
                     //bat "mvn -X -Dmaven.javadoc.skip=true --batch-mode release:clean release:prepare release:perform"
                     //bat 'git add .'
@@ -45,5 +70,29 @@
                 }
             }
        }
+    def getDevVersion() {
+        def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        def versionNumber;
+        if (gitCommit == null) {
+            versionNumber = env.BUILD_NUMBER;
+        } else {
+            versionNumber = gitCommit.take(8);
+        }
+        print 'build  versions...'
+        print versionNumber
+        return versionNumber
     }
+
+    def getReleaseVersion() {
+        def pom = readMavenPom file: 'pom.xml'
+        def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        def versionNumber;
+        if (gitCommit == null) {
+            versionNumber = env.BUILD_NUMBER;
+        } else {
+            versionNumber = gitCommit.take(8);
+        }
+        return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
+    }
+}
 
