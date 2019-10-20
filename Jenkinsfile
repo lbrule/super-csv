@@ -16,8 +16,8 @@ pipeline {
                 bat 'mvn  -Dmaven.test.skip=truet  versions:set  -DgenerateBackupPoms=false -DnewVersion=2.0.0'
                 bat 'git add .'
                 bat 'git commit -m "Test."'
-                bat('git tag -a v2.0.0')
-                bat('git push --tags')
+                bat 'git tag -a v2.0.0'
+                bat 'git push --tags'
             }
         }
    }
