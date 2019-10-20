@@ -28,6 +28,8 @@
                     //bat 'git commit -m "Test."'
                     bat 'git tag -a v2.0.7-test -m "Test Tag."'
                     bat 'git tag'
+                    bat 'git remote show origin'
+                    bat "git push origin v2.0.7-test"
                     
                     withCredentials([usernamePassword(credentialsId: '01fdcf13-8f12-47be-9a79-2e2f7a0846d0', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         bat "echo 'GIT_USERNAME = ${GIT_USERNAME}'>ludo.txt"
