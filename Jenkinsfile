@@ -21,6 +21,10 @@
                }
             }
             stage("IC - Clean Install") {
+		    when {
+			// check if branch is master
+			branch 'master2'
+		    }
                 steps {
                      script {
                       //bat 'mvn -Dmaven.test.failure.ignore=true install'
@@ -49,32 +53,4 @@
         }
 
 }
-    def getDevVersion() {
-        //def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
-        def gitCommit = bat "git rev-parse HEAD"
-	    echo "gitCommit = ${gitCommit}"
-        def versionNumber;
- 	    echo "env.BUILD_NUMBER = ${env.BUILD_NUMBER}"
-       if (gitCommit == null) {
-            versionNumber = env.BUILD_NUMBER;
-        } else {
-            versionNumber = gitCommit.take(8);
-        }
-        echo 'build  versions...'
-	    echo "versionNumber = ${versionNumber}"
-        return versionNumber
-    }
-
-    def getReleaseVersion() {
-        def pom = readMavenPom file: 'pom.xml'
-        def gitCommit = bat "returnStdout: true, script: 'git rev-parse HEAD'"
-	    echo "gitCommit = ${gitCommit}"
-        def versionNumber;
-        if (gitCommit == null) {
-            versionNumber = env.BUILD_NUMBER;
-        } else {
-            versionNumber = gitCommit.take(8);
-        }
-	    echo "versionNumber = ${versionNumber}"
-        return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
-    }
+ 
