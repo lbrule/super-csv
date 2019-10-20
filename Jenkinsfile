@@ -17,12 +17,9 @@
                 steps {
                     checkout scm
                     echo "scm = ${scm}"
+                    echo "scm = ${scm}.userRemoteConfigs[0].url
                }
             }
-                    scmURL = scm.userRemoteConfigs[0].url
-                    echo "scmURL = ${scmURL}"
-                    scmURLWithoutHttps = scmURL.replaceAll('https://','');
-                    echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
             stage("IC - Clean Install") {
                 steps {
                     bat 'mvn -Dmaven.test.failure.ignore=true install'
