@@ -5,12 +5,15 @@ pipeline {
         EMAIL_RECIPIENTS = 'ludovic.brule@gmail.com'
     }
     stages {
+
+        stage('Build with unit testing') {
             steps {
                 // Run the maven build
                 script {
                     checkout scm
                     echo "scm = ${scm}"
                     echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
+
                     // Get the Maven tool.
                     // ** NOTE: This 'M3' Maven tool must be configured
                     // **       in the global configuration.
@@ -118,7 +121,7 @@ pipeline {
                     if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
                         timeout(time: 1, unit: 'MINUTES') {
                             script {
-                                def mvnHome = tool 'Maven 3.3.9'
+                                def mvnHome = tool 'Maven 3.3.8'
                                 //NOTE : if u change the sanity test class name , change it here as well
                                 sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationSanityCheck_ITT surefire:test"
                             }
@@ -136,7 +139,7 @@ pipeline {
             steps {
                 // create the release version then create a tage with it , then push to nexus releases the released jar
                 script {
-                    def mvnHome = tool 'Maven 3.3.9' //
+                    def mvnHome = tool 'Maven 3.3.8' //
                     if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
                         def v = getReleaseVersion()
                         releasedVersion = v;
@@ -201,7 +204,7 @@ pipeline {
                         timeout(time: 1, unit: 'MINUTES') {
 
                             script {
-                                def mvnHome = tool 'Maven 3.3.9'
+                                def mvnHome = tool 'Maven 3.3.8'
                                 // NOTE : if you change the test class name change it here as well
                                 sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationE2E surefire:test"
                             }
@@ -305,7 +308,7 @@ def getReleaseVersion() {
                parallel(
                        IntegrationTest: {
                            script {
-                               def mvnHome = tool 'Maven 3.3.9'
+                               def mvnHome = tool 'Maven 3.3.8'
                                if (isUnix()) {
                                    sh "'${mvnHome}/bin/mvn'  verify -Dunit-tests.skip=true"
                                } else {
@@ -316,7 +319,7 @@ def getReleaseVersion() {
                        },
                        SonarCheck: {
                            script {
-                               def mvnHome = tool 'Maven 3.3.9'
+                               def mvnHome = tool 'Maven 3.3.8'
                                withSonarQubeEnv {
                                    // sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dsonar.host.url=http://bicsjava.bc/sonar/ -Dmaven.test.failure.ignore=true"
                                    sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dmaven.test.failure.ignore=true"
