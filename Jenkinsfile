@@ -65,7 +65,7 @@
 }
     def getDevVersion() {
         //def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
-        def gitCommit = bat "returnStdout: true, script: 'git rev-parse HEAD'"
+        def gitCommit = bat "git rev-parse HEAD"
 	    echo "gitCommit = ${gitCommit}"
         def versionNumber;
  	    echo "env.BUILD_NUMBER = ${env.BUILD_NUMBER}"
