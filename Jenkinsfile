@@ -78,12 +78,14 @@
 
     def getReleaseVersion() {
         def pom = readMavenPom file: 'pom.xml'
-        def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        def gitCommit = bat "returnStdout: true, script: 'git rev-parse HEAD'"
+	    echo "gitCommit = ${gitCommit}"
         def versionNumber;
         if (gitCommit == null) {
             versionNumber = env.BUILD_NUMBER;
         } else {
             versionNumber = gitCommit.take(8);
         }
+	    echo "versionNumber = ${versionNumber}"
         return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
     }
