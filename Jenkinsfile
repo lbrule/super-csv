@@ -30,6 +30,8 @@
                     bat 'git tag'
                     bat 'git remote show origin'
                     bat 'git config user.name'
+                    bat "git config --global user.email 'ludovic.brule@gmail.com'"
+                    bat "git config --global user.name 'ludovic.brule@gmail.com'"
                     bat 'git config --global --unset https.proxy'
                     bat 'git config --global --unset http.proxy'
                     bat "git push origin v2.0.7-test"
