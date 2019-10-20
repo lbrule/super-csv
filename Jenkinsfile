@@ -1,26 +1,3 @@
-Skip to content
- 
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@lbrule 
-Learn Git and GitHub without any code!
-Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
-
- 
-1
-0 108 lbrule/super-csv
-forked from super-csv/super-csv
- Code  Pull requests 0  Projects 0  Wiki  Security  Insights  Settings
-super-csv/Jenkinsfile2
-@lbrule lbrule Rename Jenkinsfile to Jenkinsfile2
-3702f5e 24 minutes ago
-100 lines (94 sloc)  4.26 KB
-    
 #!groovy
 
 /*
