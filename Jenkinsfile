@@ -30,6 +30,8 @@
                     bat 'git tag'
                     bat 'git remote show origin'
                     bat 'git config user.name'
+                    bat 'git config --global --unset https.proxy'
+                    bat 'git config --global --unset http.proxy'
                     bat "git push origin v2.0.7-test"
                     
                     //withCredentials([usernamePassword(credentialsId: '01fdcf13-8f12-47be-9a79-2e2f7a0846d0', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
