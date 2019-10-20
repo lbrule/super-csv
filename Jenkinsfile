@@ -18,7 +18,8 @@ pipeline {
                 bat 'git commit -m "Test."'
                 bat 'git tag -a v2.0.1-test -m "Test Tag."'
                 withCredentials([usernamePassword(credentialsId: '	e6d21786-af14-4eff-b65e-fd682ccdf65e', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    bat 'git push origin v2.0.1-test'
+                    scmURLWithoutHttps = scmURL.replaceAll('https://','');
+                    bat 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${scmURLWithoutHttps} origin v2.0.1-test'
                 }
             }
         }
