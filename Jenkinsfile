@@ -16,12 +16,11 @@ def call(context) {
             stage("IC - Checkout") {
                 steps {
                     checkout scm
-                    step {
-                        scmURLWithoutHttps = scmURL.replaceAll('https://','');
-                        echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
-                    }
+                    echo "scm = ${scm}"
                }
             }
+                        scmURLWithoutHttps = scmURL.replaceAll('https://','');
+                        echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
             stage("IC - Clean Install") {
                 steps {
                     bat 'mvn -Dmaven.test.failure.ignore=true install'
