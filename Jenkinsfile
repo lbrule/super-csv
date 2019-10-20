@@ -17,7 +17,7 @@ pipeline {
                 bat 'git add .'
                 bat 'git commit -m "Test."'
                 bat 'git tag -a v2.0.0 -m "Test Tag."'
-                bat 'git push --tags'
+                bat 'git push origin v2.0.0'
             }
         }
    }
