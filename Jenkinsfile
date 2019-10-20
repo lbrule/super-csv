@@ -16,7 +16,7 @@
                 steps {
                     checkout scm
                     echo "scm = ${scm}"
-                    scmURL = scm.userRemoteConfigs[0].url
+                    def scmURL = scm.userRemoteConfigs[0].url
                     echo "scmURL = ${scmURL}"
                     scmURLWithoutHttps = scmURL.replaceAll('https://','');
                     echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
