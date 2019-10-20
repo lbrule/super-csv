@@ -17,7 +17,7 @@
                 steps {
                     checkout scm
                     echo "scm = ${scm}"
-                    echo "scm = ${scm.userRemoteConfigs[0].url}"
+                    echo "scm = ${scm.userRemoteConfigs[0].url}.replaceAll('https://','')"
                }
             }
             stage("IC - Clean Install") {
