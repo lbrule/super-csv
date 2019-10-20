@@ -124,14 +124,6 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Acceptance') {
-            when {
-                // check if branch is master
-                branch 'master'
-            }
-            steps {
-            }
-        }
     }
     post {
         // Always runs. And it runs before any of the other post conditions.
