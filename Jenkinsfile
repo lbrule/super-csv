@@ -23,21 +23,7 @@
             stage("IC - Clean Install") {
                 steps {
                      script {
-                        // Get the Maven tool.
-                        // ** NOTE: This 'M3' Maven tool must be configured
-                        // **       in the global configuration.
-			echo 'Pulling...' + env.BRANCH_NAME
-                        def mvnHome = tool 'Maven 3.3.9'
-                       	def targetVersion = getDevVersion()
-                        echo 'target build version...'
-                        echo targetVersion
-                        def pom = readMavenPom file: 'pom.xml'
-                            // get the current development version 
-                       	developmentArtifactVersion = "${pom.version}-${targetVersion}"
-                        echo ${pom.version}
-                        echo ${developmentArtifactVersion}
-
-                   //bat 'mvn -Dmaven.test.failure.ignore=true install'
+                      //bat 'mvn -Dmaven.test.failure.ignore=true install'
                     //bat 'mvn  -Dmaven.test.skip=truet  versions:set  -DgenerateBackupPoms=false -DnewVersion=2.0.8'
                     //bat "mvn -X -Dmaven.javadoc.skip=true --batch-mode release:clean release:prepare release:perform"
                     //bat 'git add .'
