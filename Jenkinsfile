@@ -16,8 +16,10 @@ def call(context) {
             stage("IC - Checkout") {
                 steps {
                     checkout scm
-                    scmURLWithoutHttps = scmURL.replaceAll('https://','');
-                     echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
+                    step {
+                        scmURLWithoutHttps = scmURL.replaceAll('https://','');
+                        echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
+                    }
                }
             }
             stage("IC - Clean Install") {
