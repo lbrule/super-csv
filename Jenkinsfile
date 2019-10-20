@@ -5,6 +5,7 @@
 */
 
     def String scmURLWithoutHttp;
+    def scmURL = "";
     pipeline {
         agent any
         tools {
@@ -16,7 +17,7 @@
                 steps {
                     checkout scm
                     echo "scm = ${scm}"
-                    def scmURL = scm.userRemoteConfigs[0].url
+                    scmURL = scm.userRemoteConfigs[0].url
                     echo "scmURL = ${scmURL}"
                     scmURLWithoutHttps = scmURL.replaceAll('https://','');
                     echo "scmURLWithoutHttps  = ${scmURLWithoutHttps }"
