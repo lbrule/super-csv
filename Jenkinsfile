@@ -61,6 +61,8 @@
             }
        }
         }
+
+}
     def getDevVersion() {
         def gitCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
         def versionNumber;
@@ -85,4 +87,3 @@
         }
         return pom.version.replace("-SNAPSHOT", ".${versionNumber}")
     }
-}
