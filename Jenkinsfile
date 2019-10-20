@@ -15,6 +15,7 @@
             stage("IC - Checkout") {
                 steps {
                     checkout scm
+                    echo "scm = ${scm}"
                }
             }
             stage("IC - Clean Install") {
