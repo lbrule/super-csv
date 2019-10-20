@@ -1,6 +1,10 @@
 pipeline {
     // run on jenkins nodes tha has java 8 label
-     agent any
+     	agent any
+	tools {
+	    maven 'Maven 3.3.9'
+	    jdk 'jdk8'
+	}
     environment {
         EMAIL_RECIPIENTS = 'ludovic.brule@gmail.com'
     }
@@ -18,8 +22,7 @@ pipeline {
                     // ** NOTE: This 'M3' Maven tool must be configured
                     // **       in the global configuration.
                     echo 'Pulling...' + env.BRANCH_NAME
-                    def mvnHome = tool 'Maven 3.3.8'
-                        bat "mvn -Dintegration-tests.skip=true clean package"
+                        bat 'mvn -Dintegration-tests.skip=true clean package'
                         def pom = readMavenPom file: 'pom.xml'
                         print pom.version
                         junit '**//*target/surefire-reports/TEST-*.xml'
