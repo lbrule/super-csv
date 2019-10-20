@@ -1,5 +1,5 @@
+def String scmURLWithoutHttp;
 pipeline {
-    def String scmURLWithoutHttp;
     agent any
     tools {
         maven 'Maven 3.3.9'
