@@ -6,7 +6,13 @@ pipeline {
     }
     stages {
 
-        stage('Build with unit testing') {
+            stage("IC - Checkout") {
+                steps {
+                    checkout scm
+                    echo "scm = ${scm}"
+                    echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
+               }
+            }        stage('Build with unit testing') {
             steps {
                 // Run the maven build
                 script {
