@@ -5,17 +5,12 @@ pipeline {
         EMAIL_RECIPIENTS = 'ludovic.brule@gmail.com'
     }
     stages {
-
-            stage("IC - Checkout") {
-                steps {
-                    checkout scm
-                    echo "scm = ${scm}"
-                    echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
-               }
-            }        stage('Build with unit testing') {
             steps {
                 // Run the maven build
                 script {
+                    checkout scm
+                    echo "scm = ${scm}"
+                    echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
                     // Get the Maven tool.
                     // ** NOTE: This 'M3' Maven tool must be configured
                     // **       in the global configuration.
@@ -48,7 +43,7 @@ pipeline {
             // Run integration test
             steps {
                 script {
-                    def mvnHome = tool 'Maven 3.3.9'
+                    def mvnHome = tool 'Maven 3.3.8'
                     if (isUnix()) {
                         // just to trigger the integration test without unit testing
                         sh "'${mvnHome}/bin/mvn'  verify -Dunit-tests.skip=true"
@@ -65,7 +60,7 @@ pipeline {
             // Run the sonar scan
             steps {
                 script {
-                    def mvnHome = tool 'Maven 3.3.9'
+                    def mvnHome = tool 'Maven 3.3.8'
                     withSonarQubeEnv {
                      
                         sh "'${mvnHome}/bin/mvn'  verify sonar:sonar -Dintegration-tests.skip=true -Dmaven.test.failure.ignore=true"
