@@ -17,7 +17,9 @@ pipeline {
                 bat 'git add .'
                 bat 'git commit -m "Test."'
                 bat 'git tag -a v2.0.0-test -m "Test Tag."'
-                bat 'git push origin v2.0.0-test'
+                withCredentials([usernamePassword(credentialsId: 'gitlab-scc', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    bat 'git push origin v2.0.0-test'
+                }
             }
         }
    }
