@@ -24,13 +24,14 @@
                     echo "scm = ${scm}"
                     echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
 		    echo "env.BRANCH_NAME = ${env.BRANCH_NAME}"
+			echo "env.BRANCH_NAME == ~/master/"
                }
             }
             stage("IC - Clean Install") {
 		    when {
 			// check if branch is master
                         expression {
-                            BRANCH_NAME == ~/master/
+                            env.BRANCH_NAME == ~/master/
                         }
 		    }
                 steps {
