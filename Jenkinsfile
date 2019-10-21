@@ -37,7 +37,7 @@
                     //bat "mvn -X -Dmaven.javadoc.skip=true --batch-mode release:clean release:prepare release:perform"
                     //bat 'git add .'
                     //bat 'git commit -m "Test."'
-                    bat "git tag -a v${params.TAG_VERSION} -m 'Test Tag.'"
+                    bat "git tag -a v${params.TAG_VERSION} -m \"Test Tag.\""
                     bat 'git tag'
                     bat 'git remote show origin'
                     bat "git config --global user.email 'ludovic.brule@gmail.com'"
