@@ -28,7 +28,9 @@
             stage("IC - Clean Install") {
 		    when {
 			// check if branch is master
-			branch 'master'
+                        expression {
+                            env.BRANCH_NAME == ~/integration_[a-z0-9]_[0-9]{2}/ || env.BRANCH_NAME == ~/master/
+                        }
 		    }
                 steps {
                      script {
