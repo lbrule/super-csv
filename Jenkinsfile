@@ -23,13 +23,14 @@
                     checkout scm
                     echo "scm = ${scm}"
                     echo "scm = ${scm.userRemoteConfigs[0].url.replaceAll('https://','')}"
+		    echo "env.BRANCH_NAME = ${env.BRANCH_NAME}"
                }
             }
             stage("IC - Clean Install") {
 		    when {
 			// check if branch is master
                         expression {
-                            env.BRANCH_NAME == ~/master/
+                            env.BRANCH_NAME == ~/integration_[a-z0-9]_[0-9]{2}|master/
                         }
 		    }
                 steps {
